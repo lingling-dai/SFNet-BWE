@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Samples</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page-header">
+        <h1>AAAAAAAAA</h1>
+        
+        <div class="authors">
+            <p>Lingling Dai</p>
+            <p class="affiliation">aa</p>
+            <p class="affiliation">aa</p>
+        </div>
+        
+        <div class="abstract">
+            <h2>Abstract</h2>
+            <p>Speech bandwidth extension (BWE).</p>
+        </div>
+    </div>
+
+    <div class="sections-wrapper">
+        <script>
+            // 修改格式化函数
+            function formatSamplingRate(folder) {
+                // 处理ablation study的情况
+                if (folder.includes('ablation_study')) {
+                    return '8 kHz';
+                }
+                
+                // 处理其他情况
+                const match = folder.match(/(\d+)k-/);
+                if (match) {
+                    return `${match[1]} kHz`;
+                }
+                return folder;
+            }
+
+            // 定义各部分的文件结构
+            var sections = {
+                "fixed-rate": {
+                    title: "I. Audio Samples of Methods Support Fixed Sampling Rate",
+                    folders: ["8k-48k", "12k-48k", "16k-48k", "24k-48k"],
+                    columns: ["Ground Truth", "Cubic", "mdctGAN", "SEANet", "AERO", "SFNet"],
+                    filePatterns: {
+                        "8k-48k": "p364_011_mic1_{type}.wav",
+                        "12k-48k": "p361_025_mic1_{type}.wav",
+                        "16k-48k": "s5_014_mic1_{type}.wav",
+                        "24k-48k": "s5_045_mic1_{type}.wav"
+                    }
+                },
+                "arbitrary-rate": {
+                    title: "II. Audio Samples of Methods Support Arbitrary Sampling Rate",
+                    folders: ["8k-48k_arbitrary", "12k-48k_arbitrary", "16k-48k_arbitrary", "24k-48k_arbitrary"],
+                    columns: ["Ground Truth", "NUwave2", "NVSR", "SEANet", "AERO", "UDM+", "SFNet"],
+                    filePatterns: {
+                        "8k-48k_arbitrary": "p364_011_mic1_{type}.wav",
+                        "12k-48k_arbitrary": "p361_025_mic1_{type}.wav",
+                        "16k-48k_arbitrary": "s5_014_mic1_{type}.wav",
+                        "24k-48k_arbitrary": "s5_045_mic1_{type}.wav"
+                    }
+                },
+                "constrained-rate": {
+                    title: "III. Audio Samples of Methods Support Extremely Constrained Sampling Rate",
+                    folders: ["2k-48k", "4k-48k"],
+                    columns: ["Ground Truth", "Cubic", "UDM+", "mdctGAN", "NVSR", "SEANet", "AERO", "SFNet"],
+                    filePatterns: {
+                        "2k-48k": "p363_006_mic1_{type}.wav",
+                        "4k-48k": "p361_017_mic1_{type}.wav"
+                    }
+                },
+                "internal-mechanism": {
+                    title: "IV. Visualization of the Internal Mechanism",
+                    folders: ["ablation_study"],
+                    columns: ["Low Resolution", "Sine Waves", "Source-P", "Source-AP", "Source-AP+Source-P", "SFNet" ],
+                    filePatterns: {
+                        "ablation_study": "s5_391_mic1_{type}.wav"
+                    }
+                },
+                "ablation": {
+                    title: "V. Ablation Studies",
+                    folders: ["ablation_study2"],
+                    columns: ["Ground Truth", "SFNet-R", "SFNet-P",  "-Mag", "-Sin", "-Dis"],
+                    filePatterns: {
+                        "ablation_study2": "s5_391_mic1_{type}.wav"
+                    }
+                }
+            };
+
+            // 遍历每个部分
+            for (let sectionId in sections) {
+                const section = sections[sectionId];
+                
+                // 为每个部分创建独立的容器
+                document.write(`
+                    <div class="section-container" data-section="${sectionId}">
+                        <h2>${section.title}</h2>
+                        <table class="tg">
+                            <tbody>
+                                <!-- 添加列标题行 -->
+                                <tr>
+                                    <td class="tg-header">Input sr</td>
+                                    ${section.columns.map(col => `
+                                        <td class="tg-header">${col}</td>
+                                    `).join('')}
+                                </tr>
+                `);
+                
+                // 遍历该部分的每个文件夹
+                section.folders.forEach(folder => {
+                    document.write(`<tr>
+                        <td class="tg-pcvp">${formatSamplingRate(folder)}</td>`);
+                    
+                    section.columns.forEach(col => {
+                        const fileName = section.filePatterns[folder].replace('{type}', col);
+                        const imgFileName = fileName.replace('.wav', '.png');
+                        
+                        document.write(`
+                            <td class="tg-ihkz">
+                                <div class="media-container">
+                                    <img src="audio_samples/${folder}/figures/${imgFileName}" 
+                                         alt="${col}">
+                                    <div class="audio-controls">
+                                        <audio controls="controls" 
+                                               preload='none'
+                                               src="audio_samples/${folder}/${fileName}">
+                                        </audio>
+                                    </div>
+                                </div>
+                            </td>
+                        `);
+                    });
+                    
+                    document.write(`</tr>`);
+                });
+                
+                // 关闭表格和容器
+                document.write(`
+                            </tbody>
+                        </table>
+                    </div>
+                `);
+            }
+        </script>
+    </div>
+</body>
+</html> 
